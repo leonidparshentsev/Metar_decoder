@@ -83,6 +83,11 @@
     border: 1px solid var(--main_accent);
     border-radius: 20px;
 }
+
+.invalid_icao {
+    border: 1px solid var(--second_accent);
+}
+
 .search_input {
     height: 100%;
 }
@@ -135,9 +140,44 @@
     }
 }
 
+/* ------LOADING */
+.output__loading{
+    position: absolute;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    background-color: #78a5c872;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.loading__img {
+    width: 64px;
+    height: 64px;
+    
+}
+
+.loading__img img {
+    animation: loading 3s linear infinite;
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes loading {
+    from {
+      transform: rotateZ(0deg);
+    }
+  
+    to {
+      transform: rotateZ(360deg);
+    }
+}
+
 /* -------------MAIN OUTPUT */
 
 .main__output {
+    position: relative;
     flex: 1 0;
     border-radius: 20px;
     padding: 12px;

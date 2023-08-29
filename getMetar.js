@@ -1,6 +1,8 @@
 const icao = document.querySelector('.input_icao');
 const form = document.querySelector('.header__search');
 const output = document.querySelector('.output_container');
+const loading = document.querySelector('.output__loading');
+const searchIcao = document.querySelector('.header__search');
 
 class Metar {
     constructor(obj) {
@@ -49,10 +51,10 @@ class Metar {
 
     makeMetarTitleNode() {
         let data = this.airportData;
-        let container = document.createElement('div');
-        let headerBlock = document.createElement('h1');
-        let metarBlock = document.createElement('p');
-        let textBlock = document.createElement('p');
+        let container = this.createElement('div', 'output__header_container container');
+        let headerBlock = this.createElement('h2', 'header__output_title output_title title');
+        let metarBlock = this.createElement('p', 'header__output_text output_text text metar');
+        let textBlock = this.createElement('p', 'header__output_text output_text text');
 
         let [date, time] = data.observed.match(/[^T]+/g);
         time = time.match(/\d\d:\d\d/)[0];
@@ -72,15 +74,15 @@ class Metar {
     }
 
     makeObservationNode() {
-        let container = document.createElement('div');
-        let headerBlock = document.createElement('h2');
+        let container = this.createElement('div', 'output__main_container container');
+        let headerBlock = this.createElement('h2', 'main__output_title output_title title');
+
+        headerBlock.innerHTML = `Airport observations`;
 
         let windBlock = this.prepareWindBlock();
         let visibilityBlock = this.prepareVisibilityBlock(); 
         let cloudsBlock = this.prepareCloudsBlock();
         let conditionsBlock = this.prepareConditionsBlock();
-
-        headerBlock.innerHTML = `Airport observations`;
         
         container.appendChild(headerBlock);
         container.appendChild(windBlock);
@@ -95,12 +97,9 @@ class Metar {
 
     prepareWindBlock() {
         let data = this.windData;
-        let textBlock = document.createElement('p');
+        let textBlock = this.createElement('p', 'main__output_text output_text text');
         let windText = '';
         let variesWind = this.airportData.metarCode.match(/\d{3}V\d{3}/);
-        // let windDirection = data.windDirection === 0 ? 'a variable direction' : `direction ${data.windDirection}°`;
-        
-        // console.log(data);
 
         if(data.windSpeedKts > 2 && data.windDirection !== 0) {
             if(data.windGustKts !== '') {
@@ -123,7 +122,7 @@ class Metar {
     }
 
     prepareVisibilityBlock() {
-        let textBlock = document.createElement('p');
+        let textBlock = this.createElement('p', 'main__output_text output_text text');
         let isCAVOK = this.checkCAVOK();
         let visibility = this.visibilityMeters;
 
@@ -140,7 +139,7 @@ class Metar {
     }
 
     prepareCloudsBlock() {
-        let textBlock = document.createElement('p');
+        let textBlock = this.createElement('p', 'main__output_text output_text text');
         let isCAVOK = this.checkCAVOK();
         let cloudsText = this.prepareCloudsText();
 
@@ -205,7 +204,7 @@ class Metar {
     }
 
     prepareConditionsBlock() {
-        let textBlock = document.createElement('p');
+        let textBlock = this.createElement('p', 'main__output_text output_text text');
         let conditionsText = this.prepareConditionsText();
 
         textBlock.innerHTML = conditionsText;
@@ -253,25 +252,50 @@ class Metar {
     }
 
     textCAVOK = `The weather is CAVOK. That means there are no clouds below 5,000 ft or the MSA (minimum safe altitude), whichever is higher. This also means that no cumulonimbus or towering cumulus clouds have been observed and the visibility is 10 km or more or more. Furthermore, there can't be fog, precipitation nor other significant weather.`;
+
+    createElement(tagName, className) {
+        let element = document.createElement(tagName);
+        element.className = className;
+        return element;
+    }
 }
+
+document.addEventListener('DOMContentLoaded', async (event) => {
+    loading.classList.toggle('hidden');
+    let fetchResult = await getMetar('UUEE');
+    loading.classList.toggle('hidden');
+    let metar = new Metar(fetchResult);
+    output.innerHTML = '';
+    metar.appendMetar(output);
+});
 
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    let icaoCode = event.target[0].value;
+    loading.classList.toggle('hidden');
+
     console.log(event.target[0].value.toUpperCase());
-    let fetchResult = await getMetar(event);
+
+    let fetchResult = await getMetar(icaoCode);
+    loading.classList.toggle('hidden');
+
     console.log(fetchResult);
 
+    if(fetchResult === undefined) {
+        searchIcao.classList.toggle('invalid_icao');
+        return;
+    }
+
     let metar = new Metar(fetchResult);
+    output.innerHTML = '';
     metar.appendMetar(output);
-
-
 });
 
-async function getMetar(event) {
-    let icaoCode = event.target[0].value.toUpperCase();
+async function getMetar(icaoCode) {
+    // let icaoCode = event.target[0].value.toUpperCase();
+    icaoCode = icaoCode.toUpperCase();
     let fetchUrl = `https://api.checkwx.com/metar/${icaoCode}/decoded`;
-    // let metar;
 
     let fetchOptions = {
         method: 'GET',
@@ -287,11 +311,10 @@ async function getMetar(event) {
         // Handle the error!
         console.log(error);
     }
-    // console.log(metar);
 }
 
-function addNodeToDocument(tagName, innerText, parentNode) {
-    let newNode = document.createElement(tagName);
-    newNode.innerText = innerText;
-    parentNode.appendChild(newNode);
-}
+// function addNodeToDocument(tagName, innerText, parentNode) {
+//     let newNode = document.createElement(tagName);
+//     newNode.innerText = innerText;
+//     parentNode.appendChild(newNode);
+// }
