@@ -68,4 +68,4 @@ By default, the project loads a information with up-to-date weather data at Sher
 
 ### Links
 
-You can check out the resource on the [`link`](https://www.checkwxapi.com/documentation/metar).
+You can check out the resource on the [`link`](https://leonidparshentsev.github.io/Metar_decoder/).
