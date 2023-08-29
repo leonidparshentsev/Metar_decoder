@@ -4,6 +4,8 @@ const output = document.querySelector('.output_container');
 const loading = document.querySelector('.output__loading');
 const searchIcao = document.querySelector('.header__search');
 
+// Пофиксить регулярку, которая ловит смену направоения ветра в блоке RMK
+
 class Metar {
     constructor(obj) {
         this.airportData = {
@@ -272,15 +274,12 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     let icaoCode = event.target[0].value;
+    
     loading.classList.toggle('hidden');
-
-    console.log(event.target[0].value.toUpperCase());
-
     let fetchResult = await getMetar(icaoCode);
     loading.classList.toggle('hidden');
-
-    console.log(fetchResult);
 
     if(fetchResult === undefined) {
         searchIcao.classList.toggle('invalid_icao');
@@ -288,8 +287,12 @@ form.addEventListener('submit', async (event) => {
     }
 
     let metar = new Metar(fetchResult);
+    
     output.innerHTML = '';
     metar.appendMetar(output);
+
+    console.log(event.target[0].value.toUpperCase());
+    console.log(fetchResult);
 });
 
 async function getMetar(icaoCode) {
@@ -312,9 +315,3 @@ async function getMetar(icaoCode) {
         console.log(error);
     }
 }
-
-// function addNodeToDocument(tagName, innerText, parentNode) {
-//     let newNode = document.createElement(tagName);
-//     newNode.innerText = innerText;
-//     parentNode.appendChild(newNode);
-// }
