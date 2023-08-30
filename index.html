@@ -31,6 +31,7 @@
         <form class="header__search" action="">
             <input class="search_input input_icao" type="text" name="icao_code" placeholder="Enter ICAO code of airport" autocomplete="off">
             <input class="search_input input_button" type="submit" value="">
+            <p class="search__invalid_input text dark_font hidden">You entered an incorrect code.</p>
         </form>
     </header>
     <main class="main__output dark_font">
@@ -65,6 +66,6 @@
     <footer class="footer_container">
         <p class="footer__copyright text dark_font">© Leonid Parshentsev 2023</p>
     </footer>
-    <script src="getMetar.js"></script>
+    <script type="module" src="getMetar.js"></script>
 </body>
 </html>
